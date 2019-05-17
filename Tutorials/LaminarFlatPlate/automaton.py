@@ -2,47 +2,47 @@ import os
 import subprocess
 import shutil
 
-RunDir = 'GiveAnyName'
-GridDir= 'mesh'
+RunDir = 'Lfp'
+GridDir= 'CreateBlocks/grid'
 NumberOfBlocks = 4
-AbsBinaryPath="/home/jatinder/solver/FEST3D2/bin/FEST3D"
+AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
 
 def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
-    Control['CFL'] = 10.0
+    Control['CFL'] = 100.0
     Control['LoadLevel'] = 0
-    Control['MaxIterations'] = 10000
+    Control['MaxIterations'] = 50000
     Control['SaveIterations'] = 1000
     Control['OutputFileFormat'] = 'tecplot'
     Control['OutputDataFormat'] = 'ASCII'
     Control['InputFileFormat'] = 'tecplot'
     Control['InputDataFormat'] = 'ASCII'
     Control['Precision'] = 6
-    Control['Purge'] = 2
-    Control['ResidualWriteInterval'] = 100
+    Control['Purge'] = 1
+    Control['ResidualWriteInterval'] = 20
     Control['Tolerance'] = "1e-13 Continuity_abs"
     Control['DebugLevel'] = 5
     
     Scheme['InviscidFlux'] = 'ausm'
     Scheme['FaceState'] = 'muscl'
-    Scheme['Limiter'] = '1 1 1  0 0 0'
+    Scheme['Limiter'] = '0 0 0  0 0 0'
     Scheme['TurbulenceLimiter'] = '1 1 1'
     Scheme['TurbulenceModel']='none'
     Scheme['TransitionModel']='none'
-    Scheme['TimeStep']='g 1e-5'
-    Scheme['TimeIntegration']='plusgs'
+    Scheme['TimeStep']='l'
+    Scheme['TimeIntegration']='implicit'
     Scheme['HigherOrderBC']='0'
     
     Flow["NumberOfVariables"] = 5
     Flow["DensityInf"] = 1.2
-    Flow["UInf"] = 100.0
+    Flow["UInf"] = 173.59
     Flow["VInf"] = 0.0
     Flow["WInf"] = 0.0
     Flow["PressureInf"] = 103338.0
     Flow["TurbulenceIntensity"] = 1.0
     Flow["ViscosityRatio"] = 10.0
     Flow["Intermittency"] = 1.0
-    Flow["ReferenceViscosity"] = 1.7e-5
-    Flow["ViscosityLaw"] = "sutherland_law"
+    Flow["ReferenceViscosity"] = 2.083e-4
+    Flow["ViscosityLaw"] = "constant"
     Flow["ReferenceTemp"] = 300
     Flow["SutherlandTemp"] = 110.5
     Flow["PrandtlNumbers"] = "0.72 0.9"
@@ -52,7 +52,7 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     OutputControl['Out'] = ["Velocity", "Density", "Pressure", "Mu"]
     OutputControl['In'] = ["Velocity", "Density", "Pressure", "Mu"]
     ResidualControl['Out'] = ["Mass_abs", "Viscous_abs", "Continuity_abs"]
-    BoundaryConditions = [-3, -4, -5, -8, -6, -6]
+    BoundaryConditions = [-8, -4, -5, -6, -6, -6]
     return BoundaryConditions
 
 
@@ -358,12 +358,14 @@ CompilerFilename="/system/mesh/layout/compile.sh"
 NameFillerFilename="/system/mesh/layout/fill_names.sh"
 BashRunFilename="/run.sh"
 GnuplotFilename="/gnplt"
+VTKFillerFilename="/fill_vtk_name.sh"
 GenBCFile="generate_bc.cpp"
 GenLayoutFile="generate_layout.cpp"
 CompileFile="compile.sh"
 FillerFile="fill_names.sh"
 BashRunFile="run.sh"
 GnuplotFile="gnplt"
+VTKFillerFile="fill_vtk_name.sh"
 
 def WriteFullFile(RootDir,Filename, Data):
     with open(RootDir+Filename, "w+") as file:
@@ -1272,6 +1274,19 @@ set grid
 plot for [col=2:'''+str(len(ResidualControl['Out'])+1)+'''] 'time_directories/aux/resnorm' using 1:col with lines title columnheader
 pause 5; unset output; refresh; reread;
 '''
+VTKInputFiller='''#!/bin/bash
+total_process="$1"
+Time_stamp="$2"
+printf -v j "%04d" $2
+file="time_directories/$j/list.visit"
+echo -n > $file
+echo !NBLOCKS $total_process >> $file
+for((i =0; i<total_process;i++ ))
+do
+printf -v j "%02d" $i
+echo "process_$j.vtk" >> $file
+done
+'''
 
 
 def SetBC(RootDir,BoundaryConditions):
@@ -1302,6 +1317,8 @@ WriteFullFile(RunDir, CompilerFilename, Compiler)
 WriteFullFile(RunDir, NameFillerFilename, NameFiller)
 WriteFullFile(RunDir, BashRunFilename, BashRun)
 WriteFullFile(RunDir, GnuplotFilename, GnuplotPlot)
+if Control['OutputFileFormat'] == 'vtk':
+  WriteFullFile(RunDir, VTKFillerFilename, VTKInputFiller)
 
 # copy Gridfile to particular folder
 GridfilesFolder=RunDir+"/system/mesh/gridfiles/"
