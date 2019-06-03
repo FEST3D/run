@@ -77,7 +77,8 @@ def SetExpectedInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutp
     ExpectedScheme['FaceState'] = ['muscl', 'none', 'ppm', 'weno']
     ExpectedScheme['Limiter'] = '1 1 1  0 0 0'
     ExpectedScheme['TurbulenceLimiter'] = '1 1 1'
-    ExpectedScheme['TurbulenceModel']=['none', 'sst', 'kkl', 'sa', 'saBC']
+    ExpectedScheme['TurbulenceModel']=['none', 'sst', 'kkl', 'sa', 'sst2003']
+    ExpectedScheme['TransitionModel']=['none', 'bc', 'lctm2015']
     ExpectedScheme['TimeStep']=['g', 'l']
     ExpectedScheme['TimeIntegration']=['RK4', 'RK2', 'TVDRK2', 'TVDRK3', 'implicit', 'none', 'plusgs']
     ExpectedScheme['HigherOrderBC']='0'
@@ -170,13 +171,14 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert Scheme['InviscidFlux'] in ExpectedScheme['InviscidFlux']
     assert Scheme['FaceState'] in ExpectedScheme['FaceState']
     assert Scheme['TurbulenceModel'] in ExpectedScheme['TurbulenceModel']
+    assert Scheme['TransitionModel'] in ExpectedScheme['TransitionModel']
     assert Scheme['TimeIntegration'] in ExpectedScheme['TimeIntegration']
     assert Scheme['TimeStep'].split()[0] in ExpectedScheme['TimeStep']
     assert Scheme['HigherOrderBC'] in ExpectedScheme['HigherOrderBC']
     assert Flow['ViscosityLaw'] in ExpectedFlow['ViscosityLaw']
-    assert OutputControl['Out'] <= ExpectedOutputControl['Out']
-    assert OutputControl['In'] <= ExpectedOutputControl['In']
-    assert ResidualControl['Out'] <= ResidualControl['Out']
+    assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['Out'])
+    assert all(variable in ExpectedOutputControl['In'] for variable in OutputControl['In'])
+    assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
     assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks
     
