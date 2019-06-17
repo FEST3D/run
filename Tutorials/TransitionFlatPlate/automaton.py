@@ -177,7 +177,7 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert Scheme['HigherOrderBC'] in ExpectedScheme['HigherOrderBC']
     assert Flow['ViscosityLaw'] in ExpectedFlow['ViscosityLaw']
     assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['Out'])
-    assert all(variable in ExpectedOutputControl['In'] for variable in OutputControl['In'])
+    assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['In'])
     assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
     assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks

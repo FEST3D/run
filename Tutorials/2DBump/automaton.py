@@ -2,7 +2,7 @@ import os
 import subprocess
 import shutil
 
-RunDir = '2DBump'
+RunDir = 'SmoothBump'
 GridDir= 'CreateBlocks/grid'
 NumberOfBlocks = 2
 AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
@@ -33,8 +33,8 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     Scheme['HigherOrderBC']='0'
     
     Flow["NumberOfVariables"] = 5
-    Flow["DensityInf"] = 1.17682
-    Flow["UInf"] = 173.5943
+    Flow["DensityInf"] = 1.225
+    Flow["UInf"] = 170.14
     Flow["VInf"] = 0.0
     Flow["WInf"] = 0.0
     Flow["PressureInf"] = 101325.0
@@ -177,7 +177,7 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert Scheme['HigherOrderBC'] in ExpectedScheme['HigherOrderBC']
     assert Flow['ViscosityLaw'] in ExpectedFlow['ViscosityLaw']
     assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['Out'])
-    assert all(variable in ExpectedOutputControl['In'] for variable in OutputControl['In'])
+    assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['In'])
     assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
     assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks

@@ -8,7 +8,7 @@ NumberOfBlocks = 4
 AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
 
 def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
-    Control['CFL'] = 100.0
+    Control['CFL'] = 30.0
     Control['LoadLevel'] = 0
     Control['MaxIterations'] = 50000
     Control['SaveIterations'] = 1000
@@ -29,19 +29,19 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     Scheme['TurbulenceModel']='sst'
     Scheme['TransitionModel']='none'
     Scheme['TimeStep']='l'
-    Scheme['TimeIntegration']='implicit'
+    Scheme['TimeIntegration']='plusgs'
     Scheme['HigherOrderBC']='0'
     
     Flow["NumberOfVariables"] = 5
-    Flow["DensityInf"] = 1.17659
-    Flow["UInf"] = 69.445
-    Flow["VInf"] = 0.0
+    Flow["DensityInf"] = 1.2
+    Flow["UInf"] = 252.9
+    Flow["VInf"] = 10.2
     Flow["WInf"] = 0.0
-    Flow["PressureInf"] = 101325.0
-    Flow["TurbulenceIntensity"] = 0.03873
-    Flow["ViscosityRatio"] = 0.01
+    Flow["PressureInf"] = 103338.0
+    Flow["TurbulenceIntensity"] = 1.0
+    Flow["ViscosityRatio"] = 10.0
     Flow["Intermittency"] = 1.0
-    Flow["ReferenceViscosity"] = 1.63416585e-5
+    Flow["ReferenceViscosity"] = 1.424e-5
     Flow["ViscosityLaw"] = "sutherland_law"
     Flow["ReferenceTemp"] = 300
     Flow["SutherlandTemp"] = 110.5
@@ -177,7 +177,7 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert Scheme['HigherOrderBC'] in ExpectedScheme['HigherOrderBC']
     assert Flow['ViscosityLaw'] in ExpectedFlow['ViscosityLaw']
     assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['Out'])
-    assert all(variable in ExpectedOutputControl['In'] for variable in OutputControl['In'])
+    assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['In'])
     assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
     assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks

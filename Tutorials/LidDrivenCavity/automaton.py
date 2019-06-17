@@ -34,8 +34,8 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     
     Flow["NumberOfVariables"] = 5
     Flow["DensityInf"] = 1.2
-    Flow["UInf"] = 0.0
-    Flow["VInf"] = 0.0
+    Flow["UInf"] = 0.0  # Initialize the domain with zero velocity.
+    Flow["VInf"] = 0.0  # Lid velocity will be defined later in the Boundary condition file.
     Flow["WInf"] = 0.0
     Flow["PressureInf"] = 103338.0
     Flow["TurbulenceIntensity"] = 1.0
@@ -177,7 +177,7 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert Scheme['HigherOrderBC'] in ExpectedScheme['HigherOrderBC']
     assert Flow['ViscosityLaw'] in ExpectedFlow['ViscosityLaw']
     assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['Out'])
-    assert all(variable in ExpectedOutputControl['In'] for variable in OutputControl['In'])
+    assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['In'])
     assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
     assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks

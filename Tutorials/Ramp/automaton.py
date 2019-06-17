@@ -49,8 +49,8 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     Flow["SpecificHeatRatio"]=1.4
     Flow["GasConstant"]=287.0
 
-    OutputControl['Out'] = ["Velocity", "Density", "Pressure", "Mu"]
-    OutputControl['In'] = ["Velocity", "Density", "Pressure", "Mu"]
+    OutputControl['Out'] = ["Velocity", "Density", "Pressure"]
+    OutputControl['In'] = ["Velocity", "Density", "Pressure"]
     ResidualControl['Out'] = ["Mass_abs", "Viscous_abs", "Continuity_abs"]
     BoundaryConditions = [-1, -2, -6, -6, -6, -6]
     return BoundaryConditions
@@ -177,7 +177,7 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert Scheme['HigherOrderBC'] in ExpectedScheme['HigherOrderBC']
     assert Flow['ViscosityLaw'] in ExpectedFlow['ViscosityLaw']
     assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['Out'])
-    assert all(variable in ExpectedOutputControl['In'] for variable in OutputControl['In'])
+    assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['In'])
     assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
     assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks

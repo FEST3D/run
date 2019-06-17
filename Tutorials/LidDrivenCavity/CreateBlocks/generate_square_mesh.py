@@ -1,4 +1,6 @@
 import numpy as np
+# Important
+# Need numpy greater than version 1.10
 
 Nblocks = 4
 nx, ny, nz  = (129, 129, 2)

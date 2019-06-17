@@ -8,7 +8,7 @@ NumberOfBlocks = 4
 AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
 
 def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
-    Control['CFL'] = 100.0
+    Control['CFL'] = 10.0
     Control['LoadLevel'] = 0
     Control['MaxIterations'] = 50000
     Control['SaveIterations'] = 1000
@@ -33,15 +33,15 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     Scheme['HigherOrderBC']='0'
     
     Flow["NumberOfVariables"] = 5
-    Flow["DensityInf"] = 1.2
-    Flow["UInf"] = 173.59
+    Flow["DensityInf"] = 1.225
+    Flow["UInf"] = 173.5943
     Flow["VInf"] = 0.0
     Flow["WInf"] = 0.0
-    Flow["PressureInf"] = 103338.0
+    Flow["PressureInf"] = 105472.5
     Flow["TurbulenceIntensity"] = 1.0
     Flow["ViscosityRatio"] = 10.0
     Flow["Intermittency"] = 1.0
-    Flow["ReferenceViscosity"] = 2.083e-4
+    Flow["ReferenceViscosity"] = 2.12653e-4
     Flow["ViscosityLaw"] = "constant"
     Flow["ReferenceTemp"] = 300
     Flow["SutherlandTemp"] = 110.5
@@ -177,7 +177,7 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert Scheme['HigherOrderBC'] in ExpectedScheme['HigherOrderBC']
     assert Flow['ViscosityLaw'] in ExpectedFlow['ViscosityLaw']
     assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['Out'])
-    assert all(variable in ExpectedOutputControl['In'] for variable in OutputControl['In'])
+    assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['In'])
     assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
     assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks
