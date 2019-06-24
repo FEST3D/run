@@ -5,7 +5,7 @@ import shutil
 RunDir = 'LDC'
 GridDir= 'CreateBlocks/grid'
 NumberOfBlocks = 4
-AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
+AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"#Change directory name
 
 def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     Control['CFL'] = 10.0
@@ -56,7 +56,7 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     return BoundaryConditions
 
 
-BC={-1:'SUPERSONIC INLET', -2:'SUPERSONIC OUTFLOW', -3:'SUBSONIC INFLOW', -4:'SUBSONIC OUTFLOW', -5:'WALL', -6:'SYMMETRY', -7:'Pole', -8:'Far-field', -9:'Total inlet'}
+BC={-1:'SUPERSONIC INFLOW (DIRICHLET)', -2:'SUPERSONIC OUTFLOW (EXTRAPOLATION)', -3:'SUBSONIC INFLOW (MASS-FLOW RATE FIXED)', -4:'SUBSONIC OUTFLOW (PRESSURE FIXED)', -5:'WALL (NO SLIP)', -6:'SYMMETRY', -7:'POLE', -8:'FAR-FIELD', -11:'TOTAL INLET'}
 
 
 def SetExpectedInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputControl, ExpectedResidualControl):
