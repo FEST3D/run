@@ -3,24 +3,26 @@ import subprocess
 import shutil
 
 
-#%%%%%%%%%%%%%%%%%%%%%%%%% Start of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-RunDir = 'Tfp'
+#%%%%%%%%%%%%%%%%% Start of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+RunDir = 'RAE2822'
 GridDir= 'CreateBlocks/grid'
-NumberOfBlocks = 4
-AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"#Change directory name
+NumberOfBlocks = 6
+AbsBinaryPath="/absolute/path/to/FEST-3D/binary/"#Change directory name
+#example
+#AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
 
 def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
-    Control['CFL'] = 30.0
+    Control['CFL'] = 100.0
     Control['LoadLevel'] = 0
-    Control['MaxIterations'] = 50000
-    Control['SaveIterations'] = 1000
+    Control['MaxIterations'] = 10000
+    Control['SaveIterations'] = 100
     Control['OutputFileFormat'] = 'tecplot'
     Control['OutputDataFormat'] = 'ASCII'
     Control['InputFileFormat'] = 'tecplot'
     Control['InputDataFormat'] = 'ASCII'
     Control['Precision'] = 6
-    Control['Purge'] = 1
-    Control['ResidualWriteInterval'] = 20
+    Control['Purge'] = 2
+    Control['ResidualWriteInterval'] = 100
     Control['Tolerance'] = "1e-13 Continuity_abs"
     Control['DebugLevel'] = 5
     
@@ -40,10 +42,10 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     Flow["VInf"] = 10.2
     Flow["WInf"] = 0.0
     Flow["PressureInf"] = 103338.0
-    Flow["TurbulenceIntensity"] = 1.0
-    Flow["ViscosityRatio"] = 10.0
+    Flow["TurbulenceIntensity"] = 0.03873
+    Flow["ViscosityRatio"] = 0.01
     Flow["Intermittency"] = 1.0
-    Flow["ReferenceViscosity"] = 1.424e-5
+    Flow["ReferenceViscosity"] = 1.4243e-5
     Flow["ViscosityLaw"] = "sutherland_law"
     Flow["ReferenceTemp"] = 300
     Flow["SutherlandTemp"] = 110.5
@@ -51,13 +53,13 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     Flow["SpecificHeatRatio"]=1.4
     Flow["GasConstant"]=287.0
 
-    OutputControl['Out'] = ["Velocity", "Density", "Pressure", "Mu", "Mu_t"]
-    OutputControl['In'] = ["Velocity", "Density", "Pressure", "Mu", "Mu_t"]
+    OutputControl['Out'] = ["Velocity", "Density", "Pressure", "Mu"]
+    OutputControl['In'] = ["Velocity", "Density", "Pressure", "Mu"]
     ResidualControl['Out'] = ["Mass_abs", "Viscous_abs", "Continuity_abs"]
-    BoundaryConditions = [-8, -4, -5, -6, -6, -6]
+    BoundaryConditions = [-4, -4, -5, -8, -6, -6]
     return BoundaryConditions
-#%%%%%%%%%%%%%%%%%%%%%%%%% End of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+#%%%%%%%%%%%%%%%%%%%% End of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 BC={-1:'SUPERSONIC INFLOW (DIRICHLET)', -2:'SUPERSONIC OUTFLOW (EXTRAPOLATION)', -3:'SUBSONIC INFLOW (MASS-FLOW RATE FIXED)', -4:'SUBSONIC OUTFLOW (PRESSURE FIXED)', -5:'WALL (NO SLIP)', -6:'SYMMETRY', -7:'POLE', -8:'FAR-FIELD', -11:'TOTAL INLET'}
@@ -157,6 +159,7 @@ def SetExpectedInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutp
                                      ]
 
 def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputControl, ExpectedResidualControl, Control, Scheme, Flow, OutputControl, ResidualControl):
+    assert AbsBinaryPath != "/absolute/path/to/FEST-3D/binary/", "Please edit the value of 'AbsBinaryPath' variable in edit-automaton.py file, so that it points to the exact path of the FEST-3D binary installed on your machine"
     assert (Control['CFL'] > 0)
     assert (type(Control['LoadLevel']) == int and Control['LoadLevel'] >= 0)
     assert (type(Control['MaxIterations']) == int and Control['MaxIterations'] >= 0)
@@ -184,7 +187,7 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['In'])
     assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
-    assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks
+    assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks, "Please run the Makefile in CreateBlocks directory to generate grids"
     
     
 

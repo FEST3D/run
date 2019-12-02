@@ -3,60 +3,63 @@ import subprocess
 import shutil
 
 
-#%%%%%%%%%%%%%%%%%%% Start of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
-RunDir = 'T3A'
+#%%%%%%%%%% Start of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%
+RunDir = 'Ramp'
 GridDir= 'CreateBlocks/grid'
-NumberOfBlocks = 4
-AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
+NumberOfBlocks = 1
+AbsBinaryPath="/absolute/path/to/FEST-3D/binary/"#Change directory name
+#example
+#AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
 
 def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
-    Control['CFL'] = 50.0
+    Control['CFL'] = 100.0
     Control['LoadLevel'] = 0
-    Control['MaxIterations'] = 400000
-    Control['SaveIterations'] = 10000
+    Control['MaxIterations'] = 5000
+    Control['SaveIterations'] = 1000
     Control['OutputFileFormat'] = 'tecplot'
     Control['OutputDataFormat'] = 'ASCII'
-    Control['InputFileFormat'] = 'tecplot'
+    Control['InputFileFormat'] = 'vtk'
     Control['InputDataFormat'] = 'ASCII'
     Control['Precision'] = 6
     Control['Purge'] = 1
-    Control['ResidualWriteInterval'] = 20
+    Control['ResidualWriteInterval'] = 5
     Control['Tolerance'] = "1e-13 Continuity_abs"
     Control['DebugLevel'] = 5
     
-    Scheme['InviscidFlux'] = 'ausmUP'
-    Scheme['FaceState'] = 'muscl'
-    Scheme['Limiter'] = '0 0 0  0 0 0'
+    Scheme['InviscidFlux'] = 'slau'
+    Scheme['FaceState'] = 'ppm'
+    Scheme['Limiter'] = '1 1 1  0 0 0'
     Scheme['TurbulenceLimiter'] = '1 1 1'
-    Scheme['TurbulenceModel']='sst2003'
-    Scheme['TransitionModel']='lctm2015'
-    Scheme['TimeStep']='g'
-    Scheme['TimeIntegration']='plusgs'
+    Scheme['TurbulenceModel']='none'
+    Scheme['TransitionModel']='none'
+    Scheme['TimeStep']='l'
+    Scheme['TimeIntegration']='implicit'
     Scheme['HigherOrderBC']='0'
     
     Flow["NumberOfVariables"] = 5
-    Flow["DensityInf"] = 1.2
-    Flow["UInf"] = 5.18
+    Flow["DensityInf"] = 1.225
+    Flow["UInf"] = 680.588
     Flow["VInf"] = 0.0
     Flow["WInf"] = 0.0
-    Flow["PressureInf"] = 103320
-    Flow["TurbulenceIntensity"] = 3.3
-    Flow["ViscosityRatio"] = 12
+    Flow["PressureInf"] = 101325.0
+    Flow["TurbulenceIntensity"] = 1.0
+    Flow["ViscosityRatio"] = 10.0
     Flow["Intermittency"] = 1.0
-    Flow["ReferenceViscosity"] = 1.8e-5
+    Flow["ReferenceViscosity"] = 0.0
     Flow["ViscosityLaw"] = "constant"
-    Flow["ReferenceTemp"] = 300
+    Flow["ReferenceTemp"] = 273.15
     Flow["SutherlandTemp"] = 110.5
     Flow["PrandtlNumbers"] = "0.72 0.9"
     Flow["SpecificHeatRatio"]=1.4
     Flow["GasConstant"]=287.0
 
-    OutputControl['Out'] = ["Velocity", "Density", "Pressure", "TKE", "Omega", "Mu", "Mu_t"]
-    OutputControl['In'] = ["Velocity", "Density", "Pressure", "TKE", "Omega"]
-    ResidualControl['Out'] = ["Mass_abs", "Viscous_abs", "Continuity_abs", "TKE_abs", "Omega_abs"]
-    BoundaryConditions = [-3, -4, -5, -8, -6, -6]
+    OutputControl['Out'] = ["Velocity", "Density", "Pressure"]
+    OutputControl['In'] = ["Velocity", "Density", "Pressure"]
+    ResidualControl['Out'] = ["Mass_abs", "Viscous_abs", "Continuity_abs"]
+    BoundaryConditions = [-1, -2, -6, -6, -6, -6]
     return BoundaryConditions
-#%%%%%%%%%%%%%%%%%%% Start of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+#%%%%%%%%%% Start of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 BC={-1:'SUPERSONIC INFLOW (DIRICHLET)', -2:'SUPERSONIC OUTFLOW (EXTRAPOLATION)', -3:'SUBSONIC INFLOW (MASS-FLOW RATE FIXED)', -4:'SUBSONIC OUTFLOW (PRESSURE FIXED)', -5:'WALL (NO SLIP)', -6:'SYMMETRY', -7:'POLE', -8:'FAR-FIELD', -11:'TOTAL INLET'}
@@ -156,6 +159,7 @@ def SetExpectedInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutp
                                      ]
 
 def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputControl, ExpectedResidualControl, Control, Scheme, Flow, OutputControl, ResidualControl):
+    assert AbsBinaryPath != "/absolute/path/to/FEST-3D/binary/", "Please edit the value of 'AbsBinaryPath' variable in edit-automaton.py file, so that it points to the exact path of the FEST-3D binary installed on your machine"
     assert (Control['CFL'] > 0)
     assert (type(Control['LoadLevel']) == int and Control['LoadLevel'] >= 0)
     assert (type(Control['MaxIterations']) == int and Control['MaxIterations'] >= 0)
@@ -183,7 +187,7 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['In'])
     assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
-    assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks
+    assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks, "Please run the Makefile in CreateBlocks directory to generate grids"
     
     
 

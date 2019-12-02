@@ -1,11 +1,13 @@
 # run
-Run directory for FEST-3D code
+Run directory for [FEST-3D code](https://fest3d.github.io/index.html). 
+
+### [Documentation of FEST-3D code](https://fest3d.github.io/page/index.html)
 
 # How to run the code to solve a real problem
-In order to setup the run folder for solving a problem in fluid mechanics, few 
-input files are need by the FEST-3D solver. To faclitate the process of setting up
-all theses input files, a Python code is provided at [**Github**](https://github.com/FEST3D/run.git).
+A few input files are needed by the [FEST-3D](https://fest3d.github.io/index.html) solver to perform any simulation. A Python script is provided here to facilitate the process of setting up all theses input files
 
+## Caution
+An edit-samplescript.py file is provided for the users. Edit the file to replace the sample values before attempting to run the file. Make sure to provide the absolute path to the FEST3D binary to **AbsBinaryPath** variable in the script before executing.
 
 ## Dependencies
  * **C++11 compiler**
@@ -14,12 +16,12 @@ all theses input files, a Python code is provided at [**Github**](https://github
 
 
 ## Inputs
-First we need to create a directory to perform simulation and save all the input/output data.<br>
+First, we need to create a directory to perform simulation and save all the input/output data.<br>
 ```RunDir = 'Test'``` Give any name to the Run directory <br>
 One of the important input is the grid/mesh files. FEST-3D code requires a separate file for each process.
-If the domain is decomposed in to 4 blocks then 4 separate files are required. Although, you can give
-any unique name to the gridfiles, for simplicity the python code expect grdifile name in __grid_nn.txt__, where
-the nn is the _block-number-1_. So, for 4 block, we will use following: grid_00.txt, grid_01.txt, grid_02.txt, and
+If the domain is decomposed into 4 blocks, then 4 separate files are required. Although, you can give
+any unique name to the grid files, for simplicity the python code expect grid file name in __grid_nn.txt__, where
+the nn is the _block-number-1_. So, for 4 blocks, we will use the following: grid_00.txt, grid_01.txt, grid_02.txt, and
 grid_03.txt. You should keep all the grid files in a separate folder and mention name of that folder 
 at<br>
 ```GridDir='Mesh'```, here Mesh is the folder in which all the grid files are kept.<br>
@@ -27,7 +29,7 @@ at<br>
 In order to use the executable build in the binary folder of the FEST-3D code, a soft link is created
 between the FEST3D executable ```bin``` folder and FEST3D in ```bin``` folder of Run folder.<br>
 ```AbsBinaryPath="/home/jatinder/solver/FEST3D/bin/FEST3D"``` provide the absolute path to the binary.<br>
-Now, you are require to fix different paramenter of the solver based on the problem you are simulating.
+Now, you are required to fix different parameters of the solver based on the problem you are simulating.
 Meaning of the most input is self-explanatory from the name.
 ```Control['CFL'] = 1.0``` Courant–Friedrichs–Lewy number<br>
 ```Control['LoadLevel'] = 0``` Restart folder number <br>
@@ -77,29 +79,40 @@ Meaning of the most input is self-explanatory from the name.
 
 ## Expected Inputs
 ### CFL
- A floating number greater than zero.
+A floating number greater than zero.
+
 ### LoadLevel
- Number of any folder present in the time_directories/
+Number of any folder present in the time_directories/
+
 ### MaxIterations
  Integer, greater than SaveIterations
+ 
 ### SaveIterations
  Integer, lesser than MaxIteratinos
+ 
 ### InputFileFormat 
  *  vtk
  * tecplot
+ 
 ### InputDataFormat
  * ASCII
+ 
 ### OutputFileFormat
  * vtk 
  * tecplot
+ 
 ### OutputDataFormat
  * ASCII
+ 
 ### Precision
  Integer, lesser than 14 and greater than 1
+ 
 ### Purge
  Integer
+ 
 ### ResidualWriteInterval
  Integer greater than 0
+ 
 ### Tolerance
  * Mass_abs
  * Resnorm_abs
@@ -129,8 +142,10 @@ Meaning of the most input is self-explanatory from the name.
  * Dissipation_rel
  * Omega_rel
  * Kl_rel
+ 
 ### DebugLevel 
  1, 2, 3, 4, or 5
+ 
 ### InviscidFlux
  * ausm
  * ldfss0
@@ -138,26 +153,33 @@ Meaning of the most input is self-explanatory from the name.
  * van_leer
  * ausmup
  * ausmp
+ 
 ### FaceState 
  * muscl
  * none
  * ppm
  * weno
+ 
 ### Limiter
  * 1 1 1  0 0 0
+ 
 ### TurbulenceLimiter
  1 1 1 
+ 
 ###  TurbulenceModel
  * none
  * sst
  * kkl
  * sa
+ 
 ###  TransitionModel
  * lctm2015
  * bc
+ 
 ### TimeStep
  * g 1e-5
  * l
+ 
 ### TimeIntegration
  * RK4
  * RK2
@@ -166,8 +188,10 @@ Meaning of the most input is self-explanatory from the name.
  * implicit
  * plusgs
  * none
+ 
 ### HigherOrderBC
  0 or 1
+ 
 ### ViscosityLaw
  * sutherland_law
  * constant
@@ -253,26 +277,43 @@ Meaning of the most input is self-explanatory from the name.
  * -8:'Far-field', 
  * -9:'Total inlet'
 
+## Steps to run Lid-Driven cavity tutorial
 ```bash 
-$python automaton.py
+$cd Tutorials/LidDrivenCavity
 ```
-@note
-Make sure to provide the absolute path of the FEST3D binary in the automaton.py script before executing.
+Change to the directory where test cases are stored.
+```bash
+$cd CreateBlocks/
+$cd make
+```
+This will create a decomposed grid files for FEST-3D solver to run on.
+```bash
+$vi edit-automaton.py
+```
+### Caution
+You are required to edit the edit-automaton.py python script. You can use any text editor of your choice. After opening the edit-automaton.py, make sure to provide the absolute path of the FEST3D binary installed on your machine to AbsBinaryPath variable before executing the script.
+```bash
+$python edit-automaton.py
+```
+Execute the edit-automaton.py script
 
 ## Directory structure
-Executing automation.py will create a directory with usual directory structure:
- * __system__:all the input files including the mesh files and boundary condition file is located in this directory
- * __time\_directory__: all the output files will be stored in this folder.
- * __bin__: a softlink between orginal FEST-3D binary is sotred here.
- * __run.sh__: bash script to run the solver. This helps to remove log clutter on screen and save it in a log file named __out__ in the time\_directory/axu/ directory along with resnorm file which sotre the residual values. 
+Executing edit-automaton.py will create a directory with usual directory structure:
+
+* __system__:all the input files including the mesh files and boundary condition file is located in this directory
+* __time\_directory__: all the output files will be stored in this folder.
+* __bin__: a softlink between original FEST-3D binary is stored here.
+* __run.sh__: bash script to run the solver. This helps to remove log clutter on screen and save it in a log file named __out__ in the time\_directory/axu/ directory along with resnorm file which sotre the residual values. 
 
 
 ## Check Layout file
-Although 
+Although edit-automaton.py python script tries to handle the boundary condition on its own, it is still not full-proof. So, always check the layout.md file in the system/mesh/layout directory. Make sure all the boundary condition numbers are as you expect. In the case of pole boundary condition, some random number will be mentioned and required to change manually to -007. The layout file in explained in [documentation](https://fest3d.github.io/page/02_run/04_layout.html).
 
 ## Execute
 ```bash
 $mpiexec.hydra -np 16 bin/FEST3D 
 ```
-On linux os you can use following command to run FEST-3D in the background:<br>
+Instead of above command, on linux OS, you can use following command to run FEST-3D in the background:<br>
 ```nohup bash run.sh &```<br>
+
+[Checkout Documentation of FEST-3D code for more details.](https://fest3d.github.io/page/02_run/index.html)

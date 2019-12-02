@@ -3,16 +3,18 @@ import subprocess
 import shutil
 
 
-#%%%%%%%%%%%%%%%% Start of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-RunDir = 'Lfp'
+#%%%%%%%%%%%%%%%%%%%%% Start of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+RunDir = 'SmoothBump'
 GridDir= 'CreateBlocks/grid'
-NumberOfBlocks = 4
-AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D" #Change directory name
+NumberOfBlocks = 2
+AbsBinaryPath="/absolute/path/to/FEST-3D/binary/"#Change directory name
+#example
+#AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
 
 def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
-    Control['CFL'] = 10.0
+    Control['CFL'] = 500.0
     Control['LoadLevel'] = 0
-    Control['MaxIterations'] = 50000
+    Control['MaxIterations'] = 10000
     Control['SaveIterations'] = 1000
     Control['OutputFileFormat'] = 'tecplot'
     Control['OutputDataFormat'] = 'ASCII'
@@ -20,7 +22,7 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     Control['InputDataFormat'] = 'ASCII'
     Control['Precision'] = 6
     Control['Purge'] = 1
-    Control['ResidualWriteInterval'] = 20
+    Control['ResidualWriteInterval'] = 5
     Control['Tolerance'] = "1e-13 Continuity_abs"
     Control['DebugLevel'] = 5
     
@@ -36,27 +38,27 @@ def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     
     Flow["NumberOfVariables"] = 5
     Flow["DensityInf"] = 1.225
-    Flow["UInf"] = 173.5943
+    Flow["UInf"] = 170.14
     Flow["VInf"] = 0.0
     Flow["WInf"] = 0.0
-    Flow["PressureInf"] = 105472.5
+    Flow["PressureInf"] = 101325.0
     Flow["TurbulenceIntensity"] = 1.0
     Flow["ViscosityRatio"] = 10.0
     Flow["Intermittency"] = 1.0
-    Flow["ReferenceViscosity"] = 2.12653e-4
+    Flow["ReferenceViscosity"] = 0.0
     Flow["ViscosityLaw"] = "constant"
-    Flow["ReferenceTemp"] = 300
+    Flow["ReferenceTemp"] = 273.15
     Flow["SutherlandTemp"] = 110.5
     Flow["PrandtlNumbers"] = "0.72 0.9"
     Flow["SpecificHeatRatio"]=1.4
     Flow["GasConstant"]=287.0
 
-    OutputControl['Out'] = ["Velocity", "Density", "Pressure", "Mu"]
-    OutputControl['In'] = ["Velocity", "Density", "Pressure", "Mu"]
+    OutputControl['Out'] = ["Velocity", "Density", "Pressure"]
+    OutputControl['In'] = ["Velocity", "Density", "Pressure"]
     ResidualControl['Out'] = ["Mass_abs", "Viscous_abs", "Continuity_abs"]
-    BoundaryConditions = [-8, -4, -5, -6, -6, -6]
+    BoundaryConditions = [-8, -4, -6, -6, -6, -6]
     return BoundaryConditions
-#%%%%%%%%%%%%%%%% End of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#%%%%%%%%%%%%%%%%%%%%% End of Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
@@ -81,7 +83,7 @@ def SetExpectedInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutp
     ExpectedScheme['FaceState'] = ['muscl', 'none', 'ppm', 'weno']
     ExpectedScheme['Limiter'] = '1 1 1  0 0 0'
     ExpectedScheme['TurbulenceLimiter'] = '1 1 1'
-    ExpectedScheme['TurbulenceModel']=['none', 'sst', 'kkl', 'sa', 'sst2003']
+    ExpectedScheme['TurbulenceModel']=['none', 'sst', 'kkl', 'sa']
     ExpectedScheme['TransitionModel']=['none', 'bc', 'lctm2015']
     ExpectedScheme['TimeStep']=['g', 'l']
     ExpectedScheme['TimeIntegration']=['RK4', 'RK2', 'TVDRK2', 'TVDRK3', 'implicit', 'none', 'plusgs']
@@ -157,6 +159,7 @@ def SetExpectedInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutp
                                      ]
 
 def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputControl, ExpectedResidualControl, Control, Scheme, Flow, OutputControl, ResidualControl):
+    assert AbsBinaryPath != "/absolute/path/to/FEST-3D/binary/", "Please edit the value of 'AbsBinaryPath' variable in edit-automaton.py file, so that it points to the exact path of the FEST-3D binary installed on your machine"
     assert (Control['CFL'] > 0)
     assert (type(Control['LoadLevel']) == int and Control['LoadLevel'] >= 0)
     assert (type(Control['MaxIterations']) == int and Control['MaxIterations'] >= 0)
@@ -184,7 +187,7 @@ def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputCont
     assert all(variable in ExpectedOutputControl['Out'] for variable in OutputControl['In'])
     assert all(variable in ExpectedResidualControl['Out'] for variable in ResidualControl['Out'])
     #Number of grid files should be equal number of blocks as input
-    assert len(next(os.walk(GridDir))[2]) == NumberOfBlocks
+    assert (len(next(os.walk(GridDir))[2]) == NumberOfBlocks), "Please run the Makefile in CreateBlocks directory to generate grids"
     
     
 
