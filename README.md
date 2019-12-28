@@ -7,11 +7,11 @@ Run directory for [FEST-3D code](https://fest3d.github.io/index.html).
 A few input files are needed by the [FEST-3D](https://fest3d.github.io/index.html) solver to perform any simulation. A Python script is provided here to facilitate the process of setting up all theses input files
 
 ## Caution
-An edit-samplescript.py file is provided for the users. Edit the file to replace the sample values before attempting to run the file. Make sure to provide the absolute path to the FEST3D binary to **AbsBinaryPath** variable in the script before executing.
+An edit-samplescript.py file is provided for the users. Edit the file to replace the sample values before attempting to run the file.
 
 ## Dependencies
  * **C++11 compiler**
- * **Python 2.7**
+ * **Python 3**
  * **bash**
 
 
@@ -26,9 +26,6 @@ grid_03.txt. You should keep all the grid files in a separate folder and mention
 at<br>
 ```GridDir='Mesh'```, here Mesh is the folder in which all the grid files are kept.<br>
 ```NumberOfBlocks = 1``` Total number of blocks<br>
-In order to use the executable build in the binary folder of the FEST-3D code, a soft link is created
-between the FEST3D executable ```bin``` folder and FEST3D in ```bin``` folder of Run folder.<br>
-```AbsBinaryPath="/home/jatinder/solver/FEST3D/bin/FEST3D"``` provide the absolute path to the binary.<br>
 Now, you are required to fix different parameters of the solver based on the problem you are simulating.
 Meaning of the most input is self-explanatory from the name.
 ```Control['CFL'] = 1.0``` Courant–Friedrichs–Lewy number<br>
@@ -290,8 +287,6 @@ This will create a decomposed grid files for FEST-3D solver to run on.
 ```bash
 $vi edit-automaton.py
 ```
-### Caution
-You are required to edit the edit-automaton.py python script. You can use any text editor of your choice. After opening the edit-automaton.py, make sure to provide the absolute path of the FEST3D binary installed on your machine to AbsBinaryPath variable before executing the script.
 ```bash
 $python edit-automaton.py
 ```

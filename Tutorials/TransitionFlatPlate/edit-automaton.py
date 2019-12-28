@@ -7,9 +7,6 @@ import shutil
 RunDir = 'T3A'
 GridDir= 'CreateBlocks/grid'
 NumberOfBlocks = 4
-AbsBinaryPath="/absolute/path/to/FEST-3D/binary/"#Change directory name
-#example
-#AbsBinaryPath="/home/jatinder/FEST-3D/bin/FEST3D"
 
 def SetInput(Control, Scheme, Flow, OutputControl, ResidualControl):
     Control['CFL'] = 50.0
@@ -158,7 +155,7 @@ def SetExpectedInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutp
                                      ]
 
 def CheckInput(ExpectedControl, ExpectedScheme, ExpectedFlow, ExpectedOutputControl, ExpectedResidualControl, Control, Scheme, Flow, OutputControl, ResidualControl):
-    assert AbsBinaryPath != "/absolute/path/to/FEST-3D/binary/", "Please edit the value of 'AbsBinaryPath' variable in edit-automaton.py file, so that it points to the exact path of the FEST-3D binary installed on your machine"
+    assert os.environ.get("FEST3D") is not None, 'FEST3D enviornment variable is not set\nPlease use following command to export the FEST3D variable and then rerun the python scirpt\n \n$export FEST3D="absolute/path/to/bin/FEST3D"\n'
     assert (Control['CFL'] > 0)
     assert (type(Control['LoadLevel']) == int and Control['LoadLevel'] >= 0)
     assert (type(Control['MaxIterations']) == int and Control['MaxIterations'] >= 0)
@@ -1345,5 +1342,5 @@ p = subprocess.Popen(["bash", CompileFile, GenBCFile], cwd=LayoutDir)
 p.wait()
 p = subprocess.Popen(["./a.out"], cwd=LayoutDir)
 p.wait()
-p = subprocess.Popen(["ln", "-fs", AbsBinaryPath, RunDir+"/bin/FEST3D"])
+p = subprocess.Popen(["ln", "-fs", os.environ['FEST3D'], RunDir+"/bin/FEST3D"])
 p.wait()
