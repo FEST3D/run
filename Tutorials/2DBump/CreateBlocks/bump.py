@@ -17,7 +17,7 @@ z_min = 0.0
 z_max = 0.1
 
 # number of points in one block in x direction 
-nd = (imax-1)/2 + 1
+nd = (imax-1)//2 + 1
 
 # output array
 points = np.empty( [blocks,nd,jmax,kmax,3] )
